@@ -1,1 +1,214 @@
-{"schemaDefinition":{"SchemaComponent":{"description":"A self-contained, modular, and reusable schema definition, complete with metadata for versioning, categorization, and governance.","type":"object","properties":{"id":{"description":"A unique identifier for the schema component, typically a UUID.","type":"string","format":"uuid","readOnly":true},"semanticName":{"description":"A unique, human-readable name that conveys the business or domain meaning of the component (e.g., 'UserProfile', 'ProductDetails').","type":"string","pattern":"^[A-Z][a-zA-Z0-9]*$"},"description":{"description":"A comprehensive explanation of the component's purpose and intended use.","type":"string"},"schemaDefinition":{"$ref":"#/schemaDefinition/JsonSchemaDefinition"},"currentVersion":{"description":"The latest semantic version number of this component.","type":"string","pattern":"^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"},"versionHistory":{"description":"An ordered list of all versions of this schema component.","type":"array","items":{"$ref":"#/schemaDefinition/SchemaVersion"}},"modularityTags":{"description":"Tags for categorizing the component, aiding in discovery and organization (e.g., 'PII', 'Financial', 'Core').","type":"array","items":{"type":"string"},"uniqueItems":true},"directives":{"$ref":"#/schemaDefinition/ComponentDirectives"},"createdAt":{"description":"The timestamp indicating when the component was first created.","type":"string","format":"date-time","readOnly":true},"updatedAt":{"description":"The timestamp indicating the last time the component's metadata was updated.","type":"string","format":"date-time","readOnly":true}},"required":["id","semanticName","description","schemaDefinition","currentVersion","versionHistory","createdAt","updatedAt"]},"SchemaVersion":{"description":"Represents a specific, immutable version of a SchemaComponent, tracking changes over time.","type":"object","properties":{"version":{"description":"The semantic version number (e.g., '1.0.0', '2.1.0-beta.1').","type":"string","pattern":"^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"},"changelog":{"description":"A summary of the changes introduced in this version, written in Markdown.","type":"string"},"timestamp":{"description":"The timestamp when this version was published.","type":"string","format":"date-time"},"author":{"description":"Identifier for the user or system that created this version.","type":"string"}},"required":["version","changelog","timestamp","author"]},"JsonSchemaDefinition":{"description":"A flexible, recursive structure for defining a JSON schema, aligned with JSON Schema Draft 2020-12 standards.","type":"object","properties":{"description":{"type":"string"},"type":{"type":"string","enum":["object","array","string","number","integer","boolean","null"]},"properties":{"type":"object","additionalProperties":{"$ref":"#/schemaDefinition/JsonSchemaDefinition"}},"items":{"$ref":"#/schemaDefinition/JsonSchemaDefinition"},"required":{"type":"array","items":{"type":"string"}},"enum":{"type":"array"},"format":{"type":"string"},"default":{},"minLength":{"type":"integer"},"maxLength":{"type":"integer"},"minimum":{"type":"number"},"maximum":{"type":"number"},"pattern":{"type":"string","format":"regex"}},"required":["type"]},"PromptTemplate":{"description":"Defines a reusable template for generating prompts for NLP/LLM systems, with strong support for structured I/O.","type":"object","properties":{"templateId":{"type":"string","format":"uuid"},"description":{"type":"string"},"template":{"description":"The template string with placeholders in the format {{variableName}}.","type":"string"},"variables":{"type":"array","items":{"$ref":"#/schemaDefinition/TemplateVariable"}},"inputSchema":{"description":"A reference to a SchemaComponent that validates the input variables for this template.","$ref":"#/schemaDefinition/JsonSchemaDefinition"},"responseSchema":{"description":"A reference to a SchemaComponent that validates the expected output from the LLM.","$ref":"#/schemaDefinition/JsonSchemaDefinition"},"enableStructuredOutput":{"description":"If true, instructs the system to request a structured (e.g., JSON) response from the LLM that conforms to the responseSchema.","type":"boolean","default":false},"actionConcepts":{"description":"A list of high-level actions this prompt is designed to fulfill or trigger.","type":"array","items":{"$ref":"#/schemaDefinition/PromptActionConcept"}},"tags":{"type":"array","items":{"type":"string"}},"lastModified":{"type":"string","format":"date-time"}},"required":["templateId","template","inputSchema"]},"TemplateVariable":{"description":"Describes a single variable used within a PromptTemplate.","type":"object","properties":{"name":{"type":"string"},"description":{"type":"string"},"type":{"type":"string","enum":["string","number","boolean","object","array"]}},"required":["name","type"]},"PromptActionConcept":{"description":"A semantic descriptor for a high-level UI or system action that can be associated with a prompt.","type":"object","properties":{"conceptId":{"type":"string"},"description":{"type":"string"},"composability":{"description":"Defines how this action can be combined with others.","type":"string","enum":["atomic","chainable","parallel"]},"role":{"description":"The semantic role of the action in the user journey (e.g., 'DataEntry', 'Confirmation', 'Navigation').","type":"string"},"uxAffordances":{"description":"Hints for how this action might be represented in a UI (e.g., 'button', 'link', 'form_submission').","type":"array","items":{"type":"string"}},"tags":{"type":"array","items":{"type":"string"}}},"required":["conceptId","description","role"]},"ComponentDirectives":{"description":"A set of behavioral and governance controls for a SchemaComponent.","type":"object","properties":{"isAbstract":{"description":"If true, this component is a template and cannot be instantiated directly.","type":"boolean","default":false},"lifecycleStatus":{"description":"The current stage of the component in its lifecycle.","type":"string","enum":["draft","active","deprecated","retired"],"default":"draft"},"visibility":{"description":"Controls the scope in which this component is discoverable and usable.","type":"string","enum":["private","internal","public"],"default":"internal"},"governancePolicyRef":{"description":"A reference or link to an external governance policy document.","type":"string","format":"uri"}}}}}
+{
+  "schemaDefinition": {
+    "SchemaComponent": {
+      "description": "A self-contained, modular, and reusable schema definition, complete with metadata for versioning, categorization, and governance.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "A unique identifier for the schema component, typically a UUID.",
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true
+        },
+        "semanticName": {
+          "description": "A unique, human-readable name that conveys the business or domain meaning of the component (e.g., 'UserProfile', 'ProductDetails').",
+          "type": "string",
+          "pattern": "^[A-Z][a-zA-Z0-9]*$"
+        },
+        "description": {
+          "description": "A comprehensive explanation of the component's purpose and intended use.",
+          "type": "string"
+        },
+        "schemaDefinition": {
+          "$ref": "#/schemaDefinition/JsonSchemaDefinition"
+        },
+        "currentVersion": {
+          "description": "The latest semantic version number of this component.",
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        },
+        "versionHistory": {
+          "description": "An ordered list of all versions of this schema component.",
+          "type": "array",
+          "items": {
+            "$ref": "#/schemaDefinition/SchemaVersion"
+          }
+        },
+        "modularityTags": {
+          "description": "Tags for categorizing the component, aiding in discovery and organization (e.g., 'PII', 'Financial', 'Core').",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "directives": {
+          "$ref": "#/schemaDefinition/ComponentDirectives"
+        },
+        "createdAt": {
+          "description": "The timestamp indicating when the component was first created.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "updatedAt": {
+          "description": "The timestamp indicating the last time the component's metadata was updated.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        }
+      },
+      "required": ["id", "semanticName", "description", "schemaDefinition", "currentVersion", "versionHistory", "createdAt", "updatedAt"]
+    },
+    "SchemaVersion": {
+      "description": "Represents a specific, immutable version of a SchemaComponent, tracking changes over time.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "description": "The semantic version number (e.g., '1.0.0', '2.1.0-beta.1').",
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        },
+        "changelog": {
+          "description": "A summary of the changes introduced in this version, written in Markdown.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The timestamp when this version was published.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "description": "Identifier for the user or system that created this version.",
+          "type": "string"
+        }
+      },
+      "required": ["version", "changelog", "timestamp", "author"]
+    },
+    "JsonSchemaDefinition": {
+      "description": "A flexible, recursive structure for defining a JSON schema, aligned with JSON Schema Draft 2020-12 standards.",
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["object", "array", "string", "number", "integer", "boolean", "null"] },
+        "properties": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/schemaDefinition/JsonSchemaDefinition" }
+        },
+        "items": {
+          "$ref": "#/schemaDefinition/JsonSchemaDefinition"
+        },
+        "required": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "enum": { "type": "array" },
+        "format": { "type": "string" },
+        "default": {},
+        "minLength": { "type": "integer" },
+        "maxLength": { "type": "integer" },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "pattern": { "type": "string", "format": "regex" }
+      },
+      "required": ["type"]
+    },
+    "PromptTemplate": {
+      "description": "Defines a reusable template for generating prompts for NLP/LLM systems, with strong support for structured I/O.",
+      "type": "object",
+      "properties": {
+        "templateId": { "type": "string", "format": "uuid" },
+        "description": { "type": "string" },
+        "template": {
+          "description": "The template string with placeholders in the format {{variableName}}.",
+          "type": "string"
+        },
+        "variables": {
+          "type": "array",
+          "items": { "$ref": "#/schemaDefinition/TemplateVariable" }
+        },
+        "inputSchema": {
+          "description": "A reference to a SchemaComponent that validates the input variables for this template.",
+          "$ref": "#/schemaDefinition/JsonSchemaDefinition"
+        },
+        "responseSchema": {
+          "description": "A reference to a SchemaComponent that validates the expected output from the LLM.",
+          "$ref": "#/schemaDefinition/JsonSchemaDefinition"
+        },
+        "enableStructuredOutput": {
+          "description": "If true, instructs the system to request a structured (e.g., JSON) response from the LLM that conforms to the responseSchema.",
+          "type": "boolean",
+          "default": false
+        },
+        "actionConcepts": {
+          "description": "A list of high-level actions this prompt is designed to fulfill or trigger.",
+          "type": "array",
+          "items": { "$ref": "#/schemaDefinition/PromptActionConcept" }
+        },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "lastModified": { "type": "string", "format": "date-time" }
+      },
+      "required": ["templateId", "template", "inputSchema"]
+    },
+    "TemplateVariable": {
+      "description": "Describes a single variable used within a PromptTemplate.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["string", "number", "boolean", "object", "array"] }
+      },
+      "required": ["name", "type"]
+    },
+    "PromptActionConcept": {
+      "description": "A semantic descriptor for a high-level UI or system action that can be associated with a prompt.",
+      "type": "object",
+      "properties": {
+        "conceptId": { "type": "string" },
+        "description": { "type": "string" },
+        "composability": {
+          "description": "Defines how this action can be combined with others.",
+          "type": "string",
+          "enum": ["atomic", "chainable", "parallel"]
+        },
+        "role": {
+          "description": "The semantic role of the action in the user journey (e.g., 'DataEntry', 'Confirmation', 'Navigation').",
+          "type": "string"
+        },
+        "uxAffordances": {
+          "description": "Hints for how this action might be represented in a UI (e.g., 'button', 'link', 'form_submission').",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["conceptId", "description", "role"]
+    },
+    "ComponentDirectives": {
+      "description": "A set of behavioral and governance controls for a SchemaComponent.",
+      "type": "object",
+      "properties": {
+        "isAbstract": {
+          "description": "If true, this component is a template and cannot be instantiated directly.",
+          "type": "boolean",
+          "default": false
+        },
+        "lifecycleStatus": {
+          "description": "The current stage of the component in its lifecycle.",
+          "type": "string",
+          "enum": ["draft", "active", "deprecated", "retired"],
+          "default": "draft"
+        },
+        "visibility": {
+          "description": "Controls the scope in which this component is discoverable and usable.",
+          "type": "string",
+          "enum": ["private", "internal", "public"],
+          "default": "internal"
+        },
+        "governancePolicyRef": {
+          "description": "A reference or link to an external governance policy document.",
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}
